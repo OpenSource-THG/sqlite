@@ -2635,7 +2635,7 @@ int sqlite3BtreeOpen(
     rc = sqlite3PagerSetPagesize(pBt->pPager, &pBt->pageSize, nReserve);
     if( rc ) goto btree_open_out;
     pBt->usableSize = pBt->pageSize - nReserve;
-    assert( (pBt->pageSize & 7)==0 );  /* 8-byte alignment of pageSize */
+    assert( (pBt->pageSize & (sizeof(void *) - 1))==0 );  /* 8-byte alignment of pageSize */
    
 #if !defined(SQLITE_OMIT_SHARED_CACHE) && !defined(SQLITE_OMIT_DISKIO)
     /* Add the new BtShared object to the linked list sharable BtShareds.
@@ -8016,7 +8016,7 @@ static int balance_nonroot(
 
   /* Make nMaxCells a multiple of 4 in order to preserve 8-byte
   ** alignment */
-  nMaxCells = (nMaxCells + 3)&~3;
+  nMaxCells = (nMaxCells + 7)&~7;
 
   /*
   ** Allocate space for memory structures
